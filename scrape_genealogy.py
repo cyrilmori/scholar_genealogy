@@ -1,3 +1,4 @@
+import time
 from bs4 import BeautifulSoup
 import feedparser
 
@@ -16,7 +17,7 @@ def get_articles_from_author(author, max_results = 1000, category=CATEGORY):
     base_url = 'http://export.arxiv.org/api/query?search_query='
     rss_request = base_url + 'au:' + author
     rss_request += '+AND+cat:' + category
-    rss_request += '&max_results=' + str(max_results)
+    rss_request += '&start=0&max_results=' + str(max_results)
     d = feedparser.parse(rss_request)
     article_list = d.entries
     return article_list
@@ -79,8 +80,8 @@ def add_descendants(author, desc_list=[]):
         list_authors = article['authors']
         return same_author(author, list_authors[-1]['name'])
     
-    index_supervisor = len(desc_list)-1
     article_list = get_articles_from_author(author)
+    time.sleep(5)
     supervised_articles = list(filter(lambda art: supervisor(author, art), article_list))
     desc_list = add_authors_all(supervised_articles, desc_list)
     return desc_list
@@ -103,8 +104,11 @@ def get_all_descendants(main_author, main_author_id=0, desc_list=[], relation_li
 
 
 
+
+
 if __name__ == '__main__':
-    descendants, relations = get_all_descendants('Michel Devoret')
+    # print(add_descendants('Ficheux'))
+    descendants, relations = get_all_descendants('Chad Rigetti')
     print(descendants)
     print(relations)
 
