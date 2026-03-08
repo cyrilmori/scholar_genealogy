@@ -1,9 +1,12 @@
+import os, io, json
+from datetime import datetime
 import time
 from bs4 import BeautifulSoup
 import feedparser
 
 CATEGORY = 'quant-ph'
 MAX_STUDENT_PER_PAPER = 1
+SAVE_PATH = '.\\saved_results\\'
 
 
 def format_author(string):
@@ -102,13 +105,35 @@ def get_all_descendants(main_author, main_author_id=0, desc_list=[], relation_li
     return desc_list, relation_list
 
 
+def save_json(author, author_dict):
+    timestamp = datetime.now().strftime('_%Y-%m-%d_%H-%M-%S')
+    json_file = SAVE_PATH + format_author(author) + timestamp + '.json'
+    with io.open(json_file, 'w', encoding='utf-8') as f:
+        json.dump(author_dict, f, ensure_ascii=False, indent=4, sort_keys=True)
+
+
+def read_json(author):
+    list_files = os.listdir(SAVE_PATH)
+    json_file = ''
+    for file in list_files:
+        if format_author(author) in file:
+            json_file = file
+    try:
+        with io.open(SAVE_PATH + json_file, 'r', encoding='utf-8') as f:
+            author_dict = json.load(f)
+        return author_dict
+    except:
+        raise ValueError('Author name has not been scraped previously!')
+
+
 
 
 
 
 if __name__ == '__main__':
-    # print(add_descendants('Ficheux'))
-    descendants, relations = get_all_descendants('Chad Rigetti')
-    print(descendants)
-    print(relations)
+    save_json('Michel_Devoret', {'test': 'for testing bis'})
+    print(read_json('Michel Devoret'))
+    # descendants, relations = get_all_descendants('Michel Devoret')
+    # print(descendants)
+    # print(relations)
 
