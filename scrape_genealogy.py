@@ -3,6 +3,7 @@ from datetime import datetime
 import time
 from bs4 import BeautifulSoup
 import feedparser
+from treelib import Tree
 
 CATEGORY = 'quant-ph'
 MAX_STUDENT_PER_PAPER = 1
@@ -90,7 +91,7 @@ def add_descendants(author, desc_list=[]):
     return desc_list
 
 
-def get_all_descendants(main_author, main_author_id=0, desc_list=[], relation_list=[]):
+def get_all_descendants(main_author, main_author_id=0, desc_list=[], relation_list=[], save=True):
     if not desc_list:
         desc_list.append(main_author)
         relation_list = [[0,0]]
@@ -102,6 +103,9 @@ def get_all_descendants(main_author, main_author_id=0, desc_list=[], relation_li
         desc = desc_list[i]
         print(i, desc)
         desc_list, relation_list = get_all_descendants(desc, i, desc_list, relation_list)
+    if save:
+        save_json(main_author, {'desc_list': desc_list, 'relation_list': relation_list})
+        print('Saved scraped data.')
     return desc_list, relation_list
 
 
@@ -126,14 +130,28 @@ def read_json(author):
         raise ValueError('Author name has not been scraped previously!')
 
 
+def tree_from_file(author, save=True):
+    author_dict = read_json(author)
+    desc_list = author_dict['desc_list']
+    relation_list = author_dict['relation_list']
+    tree = Tree()
+    for name, relation in zip(desc_list, relation_list):
+        if relation[0] == relation[1]:
+            tree.create_node(name, format_author(name))
+        else:
+            tree.create_node(name, format_author(name), parent=format_author(desc_list[relation[0]]))
+    if save:
+        timestamp = datetime.now().strftime('_%Y-%m-%d_%H-%M-%S')
+        tree.save2file('.\\trees\\' + author + '_' + timestamp + '.txt', line_type='ascii-em')
+    tree.show()
+
 
 
 
 
 if __name__ == '__main__':
-    save_json('Michel_Devoret', {'test': 'for testing bis'})
-    print(read_json('Michel Devoret'))
     # descendants, relations = get_all_descendants('Michel Devoret')
     # print(descendants)
     # print(relations)
+    tree_from_file('William G. Alway')
 
