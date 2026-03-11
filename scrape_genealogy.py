@@ -92,6 +92,7 @@ def add_descendants(author, desc_list=[]):
 
 
 def get_all_descendants(main_author, main_author_id=0, desc_list=[], relation_list=[], save=True):
+    # Not to be used for authors which have too many descendants
     if not desc_list:
         desc_list.append(main_author)
         relation_list = [[0,0]]
@@ -102,10 +103,29 @@ def get_all_descendants(main_author, main_author_id=0, desc_list=[], relation_li
     for i in range(initial_len, len(desc_list)):
         desc = desc_list[i]
         print(i, desc)
-        desc_list, relation_list = get_all_descendants(desc, i, desc_list, relation_list)
+        desc_list, relation_list = get_all_descendants(desc, i, desc_list, relation_list, save=False)
     if save:
         save_json(main_author, {'desc_list': desc_list, 'relation_list': relation_list})
         print('Saved scraped data.')
+    return desc_list, relation_list
+
+
+def get_descendant_generations(main_author, main_author_id=0, desc_list=[], relation_list=[], n_gens=1, save=True):
+    if not desc_list:
+        desc_list.append(main_author)
+        relation_list = [[0,0]]
+        main_author_id = 0
+    if n_gens > 0:
+        initial_len = len(desc_list)
+        desc_list = add_descendants(main_author, desc_list)
+        relation_list += [[main_author_id, i] for i in range(initial_len, len(desc_list))]
+        for i in range(initial_len, len(desc_list)):
+            desc = desc_list[i]
+            print(i, desc)
+            desc_list, relation_list = get_descendant_generations(desc, i, desc_list, relation_list, n_gens=n_gens-1, save=False)
+        if save:
+            save_json(main_author, {'desc_list': desc_list, 'relation_list': relation_list})
+            print('Saved scraped data.')
     return desc_list, relation_list
 
 
@@ -150,8 +170,9 @@ def tree_from_file(author, save=True):
 
 
 if __name__ == '__main__':
-    # descendants, relations = get_all_descendants('Michel Devoret')
-    # print(descendants)
-    # print(relations)
-    tree_from_file('William G. Alway')
+    main_author = ''
+    descendants, relations = get_descendant_generations(main_author, n_gens=3)
+    print(descendants)
+    print(relations)
+    tree_from_file(main_author)
 
