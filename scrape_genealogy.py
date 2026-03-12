@@ -85,7 +85,7 @@ def add_descendants(author, desc_list=[]):
         return same_author(author, list_authors[-1]['name'])
     
     article_list = get_articles_from_author(author)
-    time.sleep(5)
+    time.sleep(3)
     supervised_articles = list(filter(lambda art: supervisor(author, art), article_list))
     desc_list = add_authors_all(supervised_articles, desc_list)
     return desc_list
