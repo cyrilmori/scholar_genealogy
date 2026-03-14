@@ -5,9 +5,6 @@ from .scrape_genealogy import format_author, get_descendant_generations, tree_fr
 
 class Interface:
 
-    def __init__(self):
-        return 0
-
     #
     # Scrape
     #
@@ -31,4 +28,4 @@ class Interface:
     # Load
     #
     def load(self, name, file=-1):
-        tree_from_file(format_author(name), fileindex=file, save=False)
+        tree_from_file(format_author(name), file_index=file, save=False)

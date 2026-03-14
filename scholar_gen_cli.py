@@ -1,5 +1,5 @@
 import argparse
-from .interface import Interface
+from scrape_gen import *
 
 def main(command_line=None):
     parser = argparse.ArgumentParser(
@@ -27,7 +27,7 @@ def main(command_line=None):
         'list',
         help = 'List and index all saved genealogy trees associated to a given author.'
     )
-    load.add_argument('name', help = 'Full name of the main author.')
+    list.add_argument('name', help = 'Full name of the main author.')
     
     #
     # Print a saved genealogy tree
