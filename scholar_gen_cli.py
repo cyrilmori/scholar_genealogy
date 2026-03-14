@@ -1,4 +1,5 @@
 import argparse
+from .interface import Interface
 
 def main(command_line=None):
     parser = argparse.ArgumentParser(
@@ -14,7 +15,8 @@ def main(command_line=None):
         'scrape',
         help = 'Scrape an author\'s descendants.'
     )
-    scrape.add_argument('name', help = 'Full name of the main author.')
+    scrape.add_argument('name', type=str, help = 'Full name of the main author.')
+    scrape.add_argument('generations', type=int, help = 'Number of generations to scrape (advised <4).')
     scrape.add_argument('-np', '--no_print', action='store_true', help = 'Do not print the final scraped genealogy tree.')
     scrape.add_argument('-ns', '--no_save', action='store_true', help = 'Do not save the scraped data.')
     
@@ -35,17 +37,17 @@ def main(command_line=None):
         help = 'Load and print a previously scraped author\'s descendants.'
     )
     load.add_argument('name', help = 'Full name of the main author.')
-    load.add_argument('-f', '--file', help = 'File index of the file (found by using the list command). Default is the most recent file.')
+    load.add_argument('-f', '--file', help = 'File index of the file (found by using the list command). Default is the most recent file.', default=-1)
     
     args = parser.parse_args(command_line)
-    # interface = Interface()
+    interface = Interface()
     match args.action:
         case 'scrape':
-            return 0
+            interface.scrape(args.name, args.generations, args.no_print, args.no_save)
         case 'list':
-            return 0
+            interface.list_files(args.name)
         case 'load':
-            return 0
+            interface.load(args.name, args.file)
 
 
 

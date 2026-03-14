@@ -136,12 +136,14 @@ def save_json(author, author_dict):
         json.dump(author_dict, f, ensure_ascii=False, indent=4, sort_keys=True)
 
 
-def read_json(author):
+def read_json(author, file_index=-1):
     list_files = os.listdir(SAVE_PATH)
     json_file = ''
-    for file in list_files:
-        if format_author(author) in file:
-            json_file = file
+    filtered_files = list(filter(lambda string: format_author(author) in string, list_files))
+    if 0 <= file_index <= len(filtered_files):
+        json_file = filtered_files[file_index]
+    else:
+        json_file = filtered_files[-1]
     try:
         with io.open(SAVE_PATH + json_file, 'r', encoding='utf-8') as f:
             author_dict = json.load(f)
@@ -150,8 +152,8 @@ def read_json(author):
         raise ValueError('Author name has not been scraped previously!')
 
 
-def tree_from_file(author, save=True):
-    author_dict = read_json(author)
+def tree_from_file(author, file_index=-1, save=True):
+    author_dict = read_json(author, file_index=file_index)
     desc_list = author_dict['desc_list']
     relation_list = author_dict['relation_list']
     tree = Tree()
